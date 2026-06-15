@@ -1,36 +1,108 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AffiliateIQ
 
-## Getting Started
+**Affiliate Performance Intelligence Dashboard** — built for NovaSaaS Co.
 
-First, run the development server:
+A full-stack analytics dashboard that replaces a manual weekly Excel reporting workflow with a live, animated, visual intelligence platform for affiliate program managers.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+> Demo mode: all data is synthetic, modeled after a real $2.48M affiliate program.
+
+---
+
+## What It Does
+
+Before this dashboard, the affiliate team at NovaSaaS Co. ran a Python script weekly, exported a CSV, and manually built a 6-tab Excel workbook that was already stale before it reached leadership. There was no way to spot fraud patterns, track payout gaps, or see retention trends without hours of manual work.
+
+AffiliateIQ replaces that entire workflow:
+
+| Old Way | AffiliateIQ |
+|---------|------------|
+| Python → CSV → Excel (manual, weekly) | Live dashboard, always current |
+| No fraud visibility | Scatter plot fraud radar with risk scoring |
+| Payout status in spreadsheet | Real-time overdue alerts + reconciliation |
+| Emailed static reports | Auto-generated weekly report cards via cron |
+| No trend data | 24-month revenue curves, cohort retention |
+
+---
+
+## Pages
+
+### Command Center (`/`)
+The main overview. Animated KPI counters for revenue, active affiliates, ROI, and commissions. A 3D particle globe visualizes the affiliate network by segment (green = champions, blue = mid-tier, amber = at-risk, red = fraud-flagged). Live revenue area chart with period selector. Alert banners for overdue payouts and fraud flags.
+
+### Leaderboard (`/leaderboard`)
+All 50 affiliates ranked and filterable by segment. Sortable by revenue, customers, cancel rate, or fraud score. Each row has an inline 12-week sparkline. Click any affiliate to open a detail modal with full stats, trend chart, and fraud evidence tags.
+
+### Fraud Radar (`/fraud`)
+Cancel rate vs. revenue scatter plot with a fraud quadrant overlay. Dots are colored by fraud score (blue → amber → red). A cluster of 8 affiliates with high cancel rates and `ad_source` campaign tags are flagged — this mirrors a real pattern discovered in the program. Individual fraud score cards show evidence strings per flagged affiliate.
+
+### Payout Health (`/payouts`)
+Timeline of all payout cycles with status (paid / overdue / upcoming). Overdue cycles surface a prominent alert with dollar amount and days late. Expandable reconciliation table shows per-affiliate payout status and FP vs. actual amount mismatches.
+
+### Growth Tracker (`/growth`)
+Quarter-over-quarter new vs. churned customer bar chart (4 negative quarters highlighted). Cohort retention curves for 4 quarterly cohorts — shows ~43% 12-month retention across all cohorts despite declining new referrals.
+
+### Weekly Reports (`/reports`)
+Grid of the last 8 auto-generated weekly report cards. Each card shows that week's KPIs and alert count. Click to expand the full snapshot with top affiliates, all KPIs, and alert details. Export to PDF.
+
+---
+
+## Automation
+
+A Vercel Cron job fires every Monday at 08:00 UTC and hits `/api/snapshot`, which:
+1. Pulls current program stats
+2. Identifies active alerts (overdue payouts, fraud flags, negative growth)
+3. Builds a snapshot with top affiliates and KPI summary
+4. Returns a JSON report card that appears in the `/reports` page
+
+```json
+// vercel.json
+{ "crons": [{ "path": "/api/snapshot", "schedule": "0 8 * * 1" }] }
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This directly replaces the manual "run the script on Monday morning" workflow.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech Stack
 
-## Learn More
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 15 (App Router) |
+| Language | TypeScript (strict) |
+| Styling | Tailwind CSS v4 |
+| 3D / Globe | Three.js + @react-three/fiber |
+| Charts | Recharts |
+| Animation | Framer Motion |
+| Automation | Vercel Cron |
+| Data | Synthetic seed (50 affiliates, 24mo history) |
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Demo Data
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The seed is calibrated to match a real program's shape:
+- **50 affiliates** across 4 segments: Champions (8), Mid-Tier (22), At-Risk (12), Fraud-Flagged (8)
+- **$2.48M** all-time attributed revenue · **$293K** commissions · **10.2x ROI**
+- **24 months** of monthly revenue per affiliate (1,200 data points)
+- **8 pre-built weekly snapshots** (last 8 Mondays)
+- **2 overdue payout cycles** ($27.7K + $41.4K) to demonstrate alert system
 
-## Deploy on Vercel
+No real API keys, credentials, or customer data are used or required.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Run Locally
+
+```bash
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+---
+
+## Built By
+
+**Mushaim Khan** — AI & Automation portfolio project  
+Demonstrates: data pipeline design, process automation, AI-adjacent tooling, end-to-end full-stack ownership
