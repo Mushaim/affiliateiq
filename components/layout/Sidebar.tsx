@@ -17,7 +17,7 @@ export function Sidebar() {
   return (
     <aside className="w-60 shrink-0 flex flex-col border-r h-screen sticky top-0" style={{ background: "var(--bg)", borderColor: "var(--border)" }}>
       <div className="px-6 py-5 border-b flex items-center gap-2" style={{ borderColor: "var(--border)" }}>
-        <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center">
+        <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "var(--accent)" }}>
           <Zap size={14} className="text-white" />
         </div>
         <span className="font-bold text-sm tracking-tight" style={{ color: "var(--text)" }}>AffiliateIQ</span>
@@ -32,7 +32,7 @@ export function Sidebar() {
               className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-150 group"
               style={{
                 color: active ? "var(--accent-glow)" : "var(--text-secondary)",
-                background: active ? "rgba(59,130,246,0.12)" : "transparent",
+                background: active ? "rgba(8,145,178,0.12)" : "transparent",
                 borderLeft: active ? "2px solid var(--accent)" : "2px solid transparent",
               }}
             >

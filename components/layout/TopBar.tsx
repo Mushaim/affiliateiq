@@ -58,16 +58,20 @@ export function TopBar({ title, subtitle }: Props) {
   const unread = ALERTS.filter(a => a.type !== "info").length;
 
   return (
-    <header className="h-14 border-b flex items-center justify-between px-6 shrink-0" style={{ background: "var(--bg)", borderColor: "var(--border)" }}>
-      <div>
-        <h1 className="text-sm font-semibold" style={{ color: "var(--text)" }}>{title}</h1>
-        {subtitle && <p className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>{subtitle}</p>}
+    <header className="h-14 border-b flex items-center justify-between px-6 shrink-0 gap-4" style={{ background: "var(--bg)", borderColor: "var(--border)" }}>
+      <div className="min-w-0">
+        <h1 className="text-sm font-semibold truncate" style={{ color: "var(--text)" }}>{title}</h1>
+        {subtitle && <p className="text-xs mt-0.5 truncate" style={{ color: "var(--muted)" }}>{subtitle}</p>}
       </div>
 
-      <div className="flex items-center gap-2">
-        <span className="text-xs px-2.5 py-1 rounded-full border" style={{ color: "var(--muted)", borderColor: "var(--border)" }}>
-          {lastRefresh}
-        </span>
+      <div className="flex items-center gap-3 shrink-0">
+        {/* Timestamp + cron info */}
+        <div className="hidden sm:flex flex-col items-end leading-tight">
+          <span className="text-xs font-medium tabular-nums" style={{ color: "var(--text-secondary, var(--muted))" }}>{lastRefresh}</span>
+          <span className="text-xs" style={{ color: "var(--muted)" }}>Cron: Mon 08:00 UTC</span>
+        </div>
+
+        <div className="w-px h-5" style={{ background: "var(--border)" }} />
 
         {/* Reload */}
         <button
