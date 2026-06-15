@@ -1,5 +1,6 @@
 "use client";
 import { useRef, useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Bell, RefreshCw, AlertTriangle, Clock, ShieldAlert, X } from "lucide-react";
 import { getProgramStats } from "@/lib/dataUtils";
 
@@ -94,26 +95,42 @@ export function TopBar({ title, subtitle }: Props) {
             )}
           </button>
 
-          {notifOpen && (
-            <div className="absolute right-0 top-full mt-2 w-80 rounded-xl border shadow-2xl overflow-hidden z-50" style={{ background: "var(--surface2)", borderColor: "var(--border)" }}>
-              <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: "var(--border)" }}>
-                <span className="text-xs font-semibold" style={{ color: "var(--text)" }}>Notifications</span>
-                <button onClick={() => setNotifOpen(false)} style={{ color: "var(--muted)" }}><X size={12} /></button>
-              </div>
-              {ALERTS.map((a, i) => (
-                <div key={i} className="flex items-start gap-3 px-4 py-3 border-b transition-colors hover:bg-white/[0.03]" style={{ borderColor: "var(--border)" }}>
-                  <div className="mt-0.5 shrink-0">{alertIcon(a.type)}</div>
-                  <div>
-                    <p className="text-xs font-semibold" style={{ color: "var(--text)" }}>{a.message}</p>
-                    <p className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>{a.detail}</p>
-                  </div>
+          <AnimatePresence>
+            {notifOpen && (
+              <motion.div
+                className="absolute right-0 top-full mt-2 w-80 rounded-xl border shadow-2xl overflow-hidden z-50"
+                style={{ background: "var(--surface2)", borderColor: "var(--border)" }}
+                initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -8 }}
+                transition={{ type: "spring", stiffness: 380, damping: 28 }}
+              >
+                <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: "var(--border)" }}>
+                  <span className="text-xs font-semibold" style={{ color: "var(--text)" }}>Notifications</span>
+                  <button onClick={() => setNotifOpen(false)} style={{ color: "var(--muted)" }}><X size={12} /></button>
                 </div>
-              ))}
-              <div className="px-4 py-2.5 text-xs text-center" style={{ color: "var(--muted)" }}>
-                {ALERTS.length} notification{ALERTS.length !== 1 ? "s" : ""}
-              </div>
-            </div>
-          )}
+                {ALERTS.map((a, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.06 }}
+                    className="flex items-start gap-3 px-4 py-3 border-b transition-colors hover:bg-white/[0.03]"
+                    style={{ borderColor: "var(--border)" }}
+                  >
+                    <div className="mt-0.5 shrink-0">{alertIcon(a.type)}</div>
+                    <div>
+                      <p className="text-xs font-semibold" style={{ color: "var(--text)" }}>{a.message}</p>
+                      <p className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>{a.detail}</p>
+                    </div>
+                  </motion.div>
+                ))}
+                <div className="px-4 py-2.5 text-xs text-center" style={{ color: "var(--muted)" }}>
+                  {ALERTS.length} notification{ALERTS.length !== 1 ? "s" : ""}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </header>

@@ -1,12 +1,14 @@
 "use client";
 import dynamic from "next/dynamic";
 import { useState, useMemo } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { PageWrapper, FadeItem } from "@/components/ui/PageWrapper";
 import { DollarSign, Users, TrendingUp, Award, AlertTriangle, Clock } from "lucide-react";
 import { TopBar } from "@/components/layout/TopBar";
 import { KPICard } from "@/components/charts/KPICard";
 import { Badge } from "@/components/ui/Badge";
 import { DateRangeFilter, DateRange } from "@/components/ui/DateRangeFilter";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { getProgramStats, getMonthlyProgramRevenue, getTopAffiliates, formatCurrency } from "@/lib/dataUtils";
 import {
   AreaChart, Area, BarChart, Bar, LineChart, Line,
@@ -71,13 +73,15 @@ export default function CommandCenter() {
   const periodAvg = chartData.length ? Math.round(periodTotal / chartData.length) : 0;
 
   return (
-    <div className="flex flex-col min-h-full">
+    <PageWrapper>
       <TopBar title="Command Center" subtitle="NovaSaaS Co. — Affiliate Program" />
 
       {/* Hero */}
       <div className="relative overflow-hidden px-6 pt-6 pb-0" style={{ minHeight: 300 }}>
         <div className="absolute inset-0 opacity-60 pointer-events-none">
-          <GlobeScene />
+          <ErrorBoundary fallback={null}>
+            <GlobeScene />
+          </ErrorBoundary>
         </div>
         <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(to bottom, transparent 30%, var(--bg) 90%)" }} />
 
@@ -97,7 +101,7 @@ export default function CommandCenter() {
         </div>
       </div>
 
-      <div className="px-6 pb-6 space-y-4">
+      <FadeItem className="px-6 pb-6 space-y-4">
         {/* Alerts */}
         {(stats.overduePayouts > 0 || stats.fraudFlaggedRevenuePct > 0.2) && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -158,7 +162,9 @@ export default function CommandCenter() {
               ))}
             </div>
 
-            {/* Chart */}
+            {/* Chart — AnimatePresence animates between metric tabs */}
+            <AnimatePresence mode="wait">
+              <motion.div key={metric} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.22, ease: "easeOut" }}>
             <ResponsiveContainer width="100%" height={200}>
               {metric === "revenue" ? (
                 <AreaChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
@@ -192,6 +198,8 @@ export default function CommandCenter() {
                 </LineChart>
               )}
             </ResponsiveContainer>
+              </motion.div>
+            </AnimatePresence>
           </motion.div>
 
           {/* Top affiliates */}
@@ -243,7 +251,7 @@ export default function CommandCenter() {
             </div>
           ))}
         </motion.div>
-      </div>
-    </div>
+      </FadeItem>
+    </PageWrapper>
   );
 }

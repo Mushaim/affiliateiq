@@ -1,6 +1,7 @@
 "use client";
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
+import { PageWrapper, FadeItem } from "@/components/ui/PageWrapper";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart, Line, ResponsiveContainer } from "recharts";
 import { TopBar } from "@/components/layout/TopBar";
 import { DateRangeFilter, DateRange } from "@/components/ui/DateRangeFilter";
@@ -55,12 +56,12 @@ export default function Growth() {
   const activeMetrics = metrics.length ? metrics as Metric[] : (["newAffiliates"] as Metric[]);
 
   return (
-    <div className="flex flex-col min-h-full">
+    <PageWrapper>
       <TopBar title="Growth Tracker" subtitle="Affiliates · customers · cohort retention" />
 
       <div className="px-6 py-4 space-y-5">
         {/* QoQ summary */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <FadeItem className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {qoq.map(({ quarter, net }) => (
             <motion.div key={quarter} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="rounded-xl border p-4" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
               <div className="text-xs" style={{ color: "var(--muted)" }}>{quarter}</div>
@@ -68,10 +69,10 @@ export default function Growth() {
               <div className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>net customers</div>
             </motion.div>
           ))}
-        </div>
+        </FadeItem>
 
         {/* Monthly breakdown — custom filters */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="rounded-xl border p-5" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+        <FadeItem className="rounded-xl border p-5" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
           <div className="flex items-start justify-between flex-wrap gap-3 mb-4">
             <div>
               <h3 className="text-sm font-semibold" style={{ color: "var(--text)" }}>Monthly Breakdown</h3>
@@ -119,10 +120,10 @@ export default function Growth() {
               </div>
             </div>
           )}
-        </motion.div>
+        </FadeItem>
 
         {/* QoQ bar chart */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="rounded-xl border p-5" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+        <FadeItem className="rounded-xl border p-5" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
           <h3 className="text-sm font-semibold mb-4" style={{ color: "var(--text)" }}>New vs. Churned — Quarterly</h3>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={qoq} margin={{ top: 4, right: 4, bottom: 4, left: 0 }}>
@@ -135,10 +136,10 @@ export default function Growth() {
               <Bar dataKey="churnedCustomers" name="Churned" fill="var(--danger)" radius={[3, 3, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
-        </motion.div>
+        </FadeItem>
 
         {/* Cohort retention */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="rounded-xl border p-5" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+        <FadeItem className="rounded-xl border p-5" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
           <div className="mb-4">
             <h3 className="text-sm font-semibold" style={{ color: "var(--text)" }}>Cohort Retention</h3>
             <p className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>% of affiliate-referred customers still active each month after acquisition</p>
@@ -155,8 +156,8 @@ export default function Growth() {
               ))}
             </LineChart>
           </ResponsiveContainer>
-        </motion.div>
+        </FadeItem>
       </div>
-    </div>
+    </PageWrapper>
   );
 }

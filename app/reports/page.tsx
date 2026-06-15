@@ -1,6 +1,7 @@
 "use client";
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { PageWrapper, FadeItem } from "@/components/ui/PageWrapper";
 import { FileText, X, TrendingDown, TrendingUp, AlertCircle, Calendar, LayoutGrid } from "lucide-react";
 import { TopBar } from "@/components/layout/TopBar";
 import { DateRangeFilter, inDateRange, DateRange } from "@/components/ui/DateRangeFilter";
@@ -134,7 +135,7 @@ export default function Reports() {
   const filtered = useMemo(() => SNAPSHOTS.filter(s => !dateRange || inDateRange(s.weekOf, dateRange)), [dateRange]);
 
   return (
-    <div className="flex flex-col min-h-full">
+    <PageWrapper>
       <TopBar title="Reports" subtitle="Auto-generated · every Monday 08:00 UTC" />
 
       <div className="px-6 py-4 space-y-4">
@@ -211,6 +212,6 @@ export default function Reports() {
       <AnimatePresence>
         {selected && <SnapshotModal snap={selected} onClose={() => setSelected(null)} />}
       </AnimatePresence>
-    </div>
+    </PageWrapper>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
+import { PageWrapper, FadeItem } from "@/components/ui/PageWrapper";
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer, Cell } from "recharts";
 import { ShieldAlert, AlertTriangle, X } from "lucide-react";
 import { TopBar } from "@/components/layout/TopBar";
@@ -59,7 +60,7 @@ export default function FraudRadar() {
   const activeFilters = evidenceFilter.length + (joinedRange ? 1 : 0) + (lastReferralRange ? 1 : 0) + (minScore ? 1 : 0);
 
   return (
-    <div className="flex flex-col min-h-full">
+    <PageWrapper>
       <TopBar title="Fraud Radar" subtitle={`${filtered.length} affiliates · ${flagged.length} flagged`} />
 
       <div className="px-6 py-4 space-y-4">
@@ -181,6 +182,6 @@ export default function FraudRadar() {
           <div className="text-center py-12 text-xs" style={{ color: "var(--muted)" }}>No affiliates match the current filters.</div>
         )}
       </div>
-    </div>
+    </PageWrapper>
   );
 }

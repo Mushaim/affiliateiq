@@ -1,6 +1,7 @@
 "use client";
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { PageWrapper, FadeItem } from "@/components/ui/PageWrapper";
 import { Search, X, ChevronDown, ChevronUp, SlidersHorizontal } from "lucide-react";
 import { TopBar } from "@/components/layout/TopBar";
 import { Badge } from "@/components/ui/Badge";
@@ -127,11 +128,12 @@ export default function Leaderboard() {
   }
 
   return (
-    <div className="flex flex-col min-h-full">
+    <PageWrapper>
       <TopBar title="Affiliate Leaderboard" subtitle={`${filtered.length} of ${AFFILIATES.length} affiliates`} />
 
       <div className="px-6 py-4 space-y-3">
         {/* Filter bar */}
+        <FadeItem>
         <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center gap-2 flex-1 min-w-44 rounded-lg border px-3 py-1.5" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
             <Search size={13} style={{ color: "var(--muted)" }} />
@@ -191,9 +193,10 @@ export default function Leaderboard() {
             )}
           </div>
         )}
+        </FadeItem>
 
         {/* Table */}
-        <div className="rounded-xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
+        <FadeItem className="rounded-xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
           <table className="w-full text-xs">
             <thead>
               <tr style={{ background: "var(--surface2)", borderBottom: "1px solid var(--border)" }}>
@@ -256,12 +259,12 @@ export default function Leaderboard() {
               ))}
             </tbody>
           </table>
-        </div>
+        </FadeItem>
       </div>
 
       <AnimatePresence>
         {selected && <AffiliateModal affiliate={selected} onClose={() => setSelected(null)} />}
       </AnimatePresence>
-    </div>
+    </PageWrapper>
   );
 }
