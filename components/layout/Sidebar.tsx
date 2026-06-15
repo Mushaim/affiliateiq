@@ -9,7 +9,7 @@ const nav = [
   { href: "/fraud", label: "Fraud Radar", icon: ShieldAlert },
   { href: "/payouts", label: "Payout Health", icon: Wallet },
   { href: "/growth", label: "Growth Tracker", icon: TrendingUp },
-  { href: "/reports", label: "Weekly Reports", icon: FileText },
+  { href: "/reports", label: "Reports", icon: FileText },
 ];
 
 export function Sidebar() {

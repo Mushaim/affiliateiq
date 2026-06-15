@@ -28,7 +28,8 @@ function genMonthly(baseRevenue: number, trend: "up" | "down" | "flat" | "volati
     const customers = Math.max(0, Math.floor(rev / 4900));
     const newRefs = Math.max(0, Math.floor(rng() * 4));
     const cancels = Math.floor(newRefs * rng() * 0.4);
-    points.push({ month: monthStr, revenue: rev, customers, newReferrals: newRefs, cancels });
+    const clicks = Math.max(0, Math.floor(rev / 120 + rng() * 80));
+    points.push({ month: monthStr, revenue: rev, customers, newReferrals: newRefs, cancels, clicks });
   }
   return points;
 }

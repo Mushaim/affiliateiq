@@ -38,6 +38,7 @@ export function getMonthlyProgramRevenue(): MonthlyPoint[] {
         existing.customers += pt.customers;
         existing.newReferrals += pt.newReferrals;
         existing.cancels += pt.cancels;
+        existing.clicks = (existing.clicks ?? 0) + (pt.clicks ?? 0);
       } else {
         monthMap.set(pt.month, { ...pt });
       }
@@ -71,27 +72,28 @@ export function getSegmentColor(segment: string): string {
 }
 
 export function getMonthlyAffiliateStats() {
-  const months: { month: string; newAffiliates: number; newCustomers: number; revenue: number; churnedCustomers: number }[] = [];
-  const byMonth = new Map<string, { newAff: number; newCust: number; rev: number; churn: number }>();
+  const months: { month: string; newAffiliates: number; newCustomers: number; revenue: number; churnedCustomers: number; clicks: number }[] = [];
+  const byMonth = new Map<string, { newAff: number; newCust: number; rev: number; churn: number; clicks: number }>();
 
   for (const a of AFFILIATES) {
     const joined = a.joinedAt.slice(0, 7);
-    const e = byMonth.get(joined) ?? { newAff: 0, newCust: 0, rev: 0, churn: 0 };
+    const e = byMonth.get(joined) ?? { newAff: 0, newCust: 0, rev: 0, churn: 0, clicks: 0 };
     e.newAff += 1;
     byMonth.set(joined, e);
 
     for (const pt of a.monthlyRevenue) {
-      const e2 = byMonth.get(pt.month) ?? { newAff: 0, newCust: 0, rev: 0, churn: 0 };
+      const e2 = byMonth.get(pt.month) ?? { newAff: 0, newCust: 0, rev: 0, churn: 0, clicks: 0 };
       e2.newCust += pt.newReferrals;
       e2.rev += pt.revenue;
       e2.churn += pt.cancels;
+      e2.clicks += (pt.clicks ?? 0);
       byMonth.set(pt.month, e2);
     }
   }
 
   const sorted = Array.from(byMonth.entries()).sort((a, b) => a[0].localeCompare(b[0]));
   for (const [month, v] of sorted) {
-    months.push({ month, newAffiliates: v.newAff, newCustomers: v.newCust, revenue: v.rev, churnedCustomers: v.churn });
+    months.push({ month, newAffiliates: v.newAff, newCustomers: v.newCust, revenue: v.rev, churnedCustomers: v.churn, clicks: v.clicks });
   }
   return months;
 }

@@ -1,98 +1,56 @@
 import { WeeklySnapshot } from "@/lib/types";
 
-export const SNAPSHOTS: WeeklySnapshot[] = [
-  {
-    generatedAt: "2026-06-09T08:00:00Z", weekOf: "2026-06-09",
-    kpis: { totalRevenue: 2480000, activeAffiliates: 83, commissionsPaid: 293000, roi: 10.2, netCustomerGrowth: -93, newAffiliates: 2, fraudFlagged: 8 },
-    topAffiliates: [
-      { id: "aff_001", name: "Jordan Mills", revenue: 342000 },
-      { id: "aff_002", name: "Priya Sharma", revenue: 298000 },
-      { id: "aff_003", name: "Marcus Chen", revenue: 267000 },
-    ],
-    alerts: [
-      { type: "overdue", message: "Jan 2026 payout of $41,400 is 16 days overdue" },
-      { type: "overdue", message: "Dec 2025 payout of $27,700 remains unpaid" },
-      { type: "fraud", message: "8 affiliates flagged: ad_source cluster + high cancel rate" },
-    ],
-  },
-  {
-    generatedAt: "2026-06-02T08:00:00Z", weekOf: "2026-06-02",
-    kpis: { totalRevenue: 2440000, activeAffiliates: 84, commissionsPaid: 287000, roi: 10.1, netCustomerGrowth: -88, newAffiliates: 3, fraudFlagged: 8 },
-    topAffiliates: [
-      { id: "aff_001", name: "Jordan Mills", revenue: 328000 },
-      { id: "aff_002", name: "Priya Sharma", revenue: 284000 },
-      { id: "aff_003", name: "Marcus Chen", revenue: 254000 },
-    ],
-    alerts: [
-      { type: "overdue", message: "Jan 2026 payout of $41,400 is 9 days overdue" },
-      { type: "fraud", message: "8 affiliates flagged: ad_source cluster" },
-    ],
-  },
-  {
-    generatedAt: "2026-05-26T08:00:00Z", weekOf: "2026-05-26",
-    kpis: { totalRevenue: 2398000, activeAffiliates: 85, commissionsPaid: 281000, roi: 9.9, netCustomerGrowth: -82, newAffiliates: 1, fraudFlagged: 8 },
-    topAffiliates: [
-      { id: "aff_001", name: "Jordan Mills", revenue: 314000 },
-      { id: "aff_002", name: "Priya Sharma", revenue: 271000 },
-      { id: "aff_003", name: "Marcus Chen", revenue: 242000 },
-    ],
-    alerts: [
-      { type: "overdue", message: "Jan 2026 payout of $41,400 overdue" },
-      { type: "decline", message: "Active affiliate count down from 114 peak (net -29)" },
-    ],
-  },
-  {
-    generatedAt: "2026-05-19T08:00:00Z", weekOf: "2026-05-19",
-    kpis: { totalRevenue: 2356000, activeAffiliates: 86, commissionsPaid: 275000, roi: 9.8, netCustomerGrowth: -76, newAffiliates: 4, fraudFlagged: 8 },
-    topAffiliates: [
-      { id: "aff_001", name: "Jordan Mills", revenue: 300000 },
-      { id: "aff_002", name: "Priya Sharma", revenue: 259000 },
-      { id: "aff_003", name: "Marcus Chen", revenue: 232000 },
-    ],
-    alerts: [
-      { type: "fraud", message: "8 affiliates in ad_source cluster — investigation recommended" },
-    ],
-  },
-  {
-    generatedAt: "2026-05-12T08:00:00Z", weekOf: "2026-05-12",
-    kpis: { totalRevenue: 2314000, activeAffiliates: 88, commissionsPaid: 269000, roi: 9.6, netCustomerGrowth: -69, newAffiliates: 2, fraudFlagged: 7 },
-    topAffiliates: [
-      { id: "aff_001", name: "Jordan Mills", revenue: 287000 },
-      { id: "aff_002", name: "Priya Sharma", revenue: 247000 },
-      { id: "aff_003", name: "Marcus Chen", revenue: 221000 },
-    ],
-    alerts: [
-      { type: "decline", message: "Net customer growth negative for 4 consecutive quarters" },
-    ],
-  },
-  {
-    generatedAt: "2026-05-05T08:00:00Z", weekOf: "2026-05-05",
-    kpis: { totalRevenue: 2271000, activeAffiliates: 89, commissionsPaid: 264000, roi: 9.5, netCustomerGrowth: -61, newAffiliates: 5, fraudFlagged: 7 },
-    topAffiliates: [
-      { id: "aff_001", name: "Jordan Mills", revenue: 273000 },
-      { id: "aff_002", name: "Priya Sharma", revenue: 235000 },
-      { id: "aff_003", name: "Marcus Chen", revenue: 210000 },
-    ],
-    alerts: [],
-  },
-  {
-    generatedAt: "2026-04-28T08:00:00Z", weekOf: "2026-04-28",
-    kpis: { totalRevenue: 2228000, activeAffiliates: 91, commissionsPaid: 258000, roi: 9.3, netCustomerGrowth: -53, newAffiliates: 3, fraudFlagged: 6 },
-    topAffiliates: [
-      { id: "aff_001", name: "Jordan Mills", revenue: 259000 },
-      { id: "aff_002", name: "Priya Sharma", revenue: 222000 },
-      { id: "aff_003", name: "Marcus Chen", revenue: 198000 },
-    ],
-    alerts: [],
-  },
-  {
-    generatedAt: "2026-04-21T08:00:00Z", weekOf: "2026-04-21",
-    kpis: { totalRevenue: 2184000, activeAffiliates: 93, commissionsPaid: 252000, roi: 9.1, netCustomerGrowth: -44, newAffiliates: 6, fraudFlagged: 5 },
-    topAffiliates: [
-      { id: "aff_001", name: "Jordan Mills", revenue: 245000 },
-      { id: "aff_002", name: "Priya Sharma", revenue: 209000 },
-      { id: "aff_003", name: "Marcus Chen", revenue: 186000 },
-    ],
-    alerts: [],
-  },
-];
+// Generate 52 weekly snapshots going back from Jun 9 2026 to Jun 10 2025
+function monday(weeksAgo: number): string {
+  const base = new Date(2026, 5, 9); // June 9 2026 (Monday)
+  base.setDate(base.getDate() - weeksAgo * 7);
+  return base.toISOString().split("T")[0];
+}
+
+function isoTs(weekOf: string): string {
+  return `${weekOf}T08:00:00Z`;
+}
+
+// Simulate program metrics trending over time
+// At 52 weeks ago: healthier program. Steady decline to present.
+function weekStats(weeksAgo: number) {
+  const decay = weeksAgo / 52;
+  const activeAffiliates = Math.round(114 - (114 - 83) * (1 - decay));
+  const totalRevenue = Math.round(2480000 - weeksAgo * 14000);
+  const commissionsPaid = Math.round(293000 - weeksAgo * 1800);
+  const roi = parseFloat((10.2 - weeksAgo * 0.02).toFixed(1));
+  const netCustomerGrowth = weeksAgo > 30 ? Math.floor((30 - weeksAgo) * 0.5) : -Math.floor((30 - weeksAgo) * 1.2);
+  const fraudFlagged = weeksAgo > 30 ? 0 : weeksAgo > 20 ? 3 : weeksAgo > 10 ? 5 : 8;
+  const newAffiliates = weeksAgo > 35 ? Math.floor(3 + Math.random() * 4) : weeksAgo > 20 ? Math.floor(1 + Math.random() * 3) : Math.floor(Math.random() * 2);
+  return { totalRevenue, activeAffiliates, commissionsPaid, roi, netCustomerGrowth, newAffiliates, fraudFlagged };
+}
+
+function topAffiliates(weeksAgo: number) {
+  const scale = 1 - weeksAgo * 0.003;
+  return [
+    { id: "aff_001", name: "Jordan Mills",  revenue: Math.round(342000 * scale) },
+    { id: "aff_002", name: "Priya Sharma",  revenue: Math.round(298000 * scale) },
+    { id: "aff_003", name: "Marcus Chen",   revenue: Math.round(267000 * scale) },
+  ];
+}
+
+function alerts(weeksAgo: number): WeeklySnapshot["alerts"] {
+  const list: WeeklySnapshot["alerts"] = [];
+  if (weeksAgo <= 8) list.push({ type: "overdue", message: "Jan 2026 payout of $41,400 overdue" });
+  if (weeksAgo <= 10) list.push({ type: "overdue", message: "Dec 2025 payout of $27,700 unpaid" });
+  if (weeksAgo <= 14) list.push({ type: "fraud", message: "8 affiliates flagged: ad_source cluster + high cancel rate" });
+  if (weeksAgo >= 10 && weeksAgo <= 30) list.push({ type: "decline", message: "Active affiliate count declining from 114 peak" });
+  return list;
+}
+
+export const SNAPSHOTS: WeeklySnapshot[] = Array.from({ length: 52 }, (_, i) => {
+  const weekOf = monday(i);
+  const kpis = weekStats(i);
+  return {
+    generatedAt: isoTs(weekOf),
+    weekOf,
+    kpis,
+    topAffiliates: topAffiliates(i),
+    alerts: alerts(i),
+  };
+});

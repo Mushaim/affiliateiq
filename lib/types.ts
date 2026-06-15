@@ -10,6 +10,7 @@ export interface MonthlyPoint {
   customers: number;
   newReferrals: number;
   cancels: number;
+  clicks: number;
 }
 
 export interface AffiliateMetrics {
