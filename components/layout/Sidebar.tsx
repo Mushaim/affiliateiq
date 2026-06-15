@@ -1,15 +1,15 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Trophy, ShieldAlert, Wallet, TrendingUp, FileText, Zap } from "lucide-react";
+import { LayoutDashboard, Trophy, ShieldAlert, TrendingUp, FileText, Zap, CreditCard } from "lucide-react";
 
 const nav = [
-  { href: "/", label: "Command Center", icon: LayoutDashboard },
-  { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
-  { href: "/fraud", label: "Fraud Radar", icon: ShieldAlert },
-  { href: "/payouts", label: "Payout Health", icon: Wallet },
-  { href: "/growth", label: "Growth Tracker", icon: TrendingUp },
-  { href: "/reports", label: "Reports", icon: FileText },
+  { href: "/",            label: "Command Center", icon: LayoutDashboard },
+  { href: "/leaderboard", label: "Leaderboard",    icon: Trophy },
+  { href: "/fraud",       label: "Fraud Radar",    icon: ShieldAlert },
+  { href: "/growth",      label: "Growth Tracker", icon: TrendingUp },
+  { href: "/reports",     label: "Reports",        icon: FileText },
+  { href: "/payouts",     label: "Payouts",        icon: CreditCard },
 ];
 
 export function Sidebar() {

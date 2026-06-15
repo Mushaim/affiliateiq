@@ -3,6 +3,9 @@ export type CampaignType = "solutions-partner" | "content" | "coupon" | "ad-sour
 export type AffiliateStatus = "active" | "inactive" | "archived";
 export type PayoutStatus = "paid" | "overdue" | "upcoming" | "processing";
 export type PayoutItemStatus = "paid" | "pending" | "flagged";
+export type Country = "US" | "UK" | "CA" | "DE" | "AU" | "IN" | "SE" | "NL" | "FR" | "SG" | "BR" | "PH";
+export type CommissionTier = "bronze" | "silver" | "gold" | "platinum";
+export type TrafficSource = "organic-search" | "paid-social" | "youtube" | "email" | "podcast" | "linkedin" | "twitter-x" | "reddit";
 
 export interface MonthlyPoint {
   month: string;
@@ -11,6 +14,8 @@ export interface MonthlyPoint {
   newReferrals: number;
   cancels: number;
   clicks: number;
+  conversionRate: number;
+  avgOrderValue: number;
 }
 
 export interface AffiliateMetrics {
@@ -23,6 +28,9 @@ export interface AffiliateMetrics {
   lastReferralAt: string;
   fraudScore: number;
   fraudEvidence: string[];
+  conversionRate: number;
+  avgOrderValue: number;
+  customerLTV: number;
 }
 
 export interface Affiliate {
@@ -33,6 +41,9 @@ export interface Affiliate {
   segment: AffiliateSegment;
   campaignType: CampaignType;
   status: AffiliateStatus;
+  country: Country;
+  tier: CommissionTier;
+  trafficSources: TrafficSource[];
   metrics: AffiliateMetrics;
   monthlyRevenue: MonthlyPoint[];
 }
@@ -86,4 +97,7 @@ export interface ProgramStats {
   overduePayouts: number;
   nextPayoutDue: number;
   fraudFlaggedRevenuePct: number;
+  avgOrderValue: number;
+  avgConversionRate: number;
+  topCountry: Country;
 }

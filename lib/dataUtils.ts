@@ -1,4 +1,4 @@
-import { Affiliate, ProgramStats, MonthlyPoint } from "./types";
+import { Affiliate, ProgramStats, MonthlyPoint, Country, CommissionTier } from "./types";
 import { AFFILIATES } from "@/data/seed/affiliates";
 import { PAYOUT_CYCLES } from "@/data/seed/payouts";
 
@@ -8,10 +8,22 @@ export function getProgramStats(): ProgramStats {
   const allTimeRevenue = all.reduce((s, a) => s + a.metrics.totalRevenue, 0);
   const allTimeCommissions = all.reduce((s, a) => s + a.metrics.lifetimeCommissions, 0);
   const activeCustomers = all.reduce((s, a) => s + a.metrics.activeCustomers, 0);
-  const totalCustomers = all.reduce((s, a) => s + a.metrics.totalCustomers, 0);
   const fraudRev = all.filter(a => a.segment === "fraud-flagged").reduce((s, a) => s + a.metrics.totalRevenue, 0);
   const overdue = PAYOUT_CYCLES.filter(c => c.status === "overdue").reduce((s, c) => s + c.totalAmount, 0);
   const upcoming = PAYOUT_CYCLES.filter(c => c.status === "upcoming").reduce((s, c) => s + c.totalAmount, 0);
+
+  const avgOrderValue = Math.round(all.reduce((s, a) => s + a.metrics.avgOrderValue, 0) / all.length);
+  const avgConversionRate = parseFloat((all.reduce((s, a) => s + a.metrics.conversionRate, 0) / all.length).toFixed(4));
+
+  const countryRevMap = new Map<Country, number>();
+  for (const a of all) {
+    countryRevMap.set(a.country, (countryRevMap.get(a.country) ?? 0) + a.metrics.totalRevenue);
+  }
+  let topCountry: Country = "US";
+  let topRev = 0;
+  for (const [c, r] of countryRevMap) {
+    if (r > topRev) { topRev = r; topCountry = c; }
+  }
 
   return {
     allTimeRevenue,
@@ -25,7 +37,52 @@ export function getProgramStats(): ProgramStats {
     overduePayouts: overdue,
     nextPayoutDue: upcoming,
     fraudFlaggedRevenuePct: parseFloat((fraudRev / allTimeRevenue).toFixed(3)),
+    avgOrderValue,
+    avgConversionRate,
+    topCountry,
   };
+}
+
+export function getTopCountries(): { country: Country; revenue: number; affiliates: number }[] {
+  const map = new Map<Country, { revenue: number; affiliates: number }>();
+  for (const a of AFFILIATES) {
+    const existing = map.get(a.country) ?? { revenue: 0, affiliates: 0 };
+    existing.revenue += a.metrics.totalRevenue;
+    existing.affiliates += 1;
+    map.set(a.country, existing);
+  }
+  return Array.from(map.entries())
+    .map(([country, v]) => ({ country, ...v }))
+    .sort((a, b) => b.revenue - a.revenue);
+}
+
+export function getConversionFunnel(): { month: string; conversionRate: number }[] {
+  const monthMap = new Map<string, { total: number; count: number }>();
+  for (const a of AFFILIATES) {
+    for (const pt of a.monthlyRevenue) {
+      const e = monthMap.get(pt.month) ?? { total: 0, count: 0 };
+      e.total += pt.conversionRate;
+      e.count += 1;
+      monthMap.set(pt.month, e);
+    }
+  }
+  return Array.from(monthMap.entries())
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([month, v]) => ({ month, conversionRate: parseFloat((v.total / v.count).toFixed(4)) }));
+}
+
+export function getTierBreakdown(): { tier: CommissionTier; count: number; revenue: number; avgCancelRate: number }[] {
+  const map = new Map<CommissionTier, { count: number; revenue: number; cancelRateSum: number }>();
+  for (const a of AFFILIATES) {
+    const e = map.get(a.tier) ?? { count: 0, revenue: 0, cancelRateSum: 0 };
+    e.count += 1;
+    e.revenue += a.metrics.totalRevenue;
+    e.cancelRateSum += a.metrics.cancelRate;
+    map.set(a.tier, e);
+  }
+  return Array.from(map.entries())
+    .map(([tier, v]) => ({ tier, count: v.count, revenue: v.revenue, avgCancelRate: parseFloat((v.cancelRateSum / v.count).toFixed(3)) }))
+    .sort((a, b) => b.revenue - a.revenue);
 }
 
 export function getMonthlyProgramRevenue(): MonthlyPoint[] {

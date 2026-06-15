@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PageWrapper, FadeItem } from "@/components/ui/PageWrapper";
-import { DollarSign, Users, TrendingUp, Award, AlertTriangle, Clock } from "lucide-react";
+import { DollarSign, Users, TrendingUp, Award, AlertTriangle, Clock, Activity, ShoppingCart } from "lucide-react";
 import { TopBar } from "@/components/layout/TopBar";
 import { KPICard } from "@/components/charts/KPICard";
 import { Badge } from "@/components/ui/Badge";
@@ -93,11 +93,13 @@ export default function CommandCenter() {
           <h2 className="text-2xl font-bold tracking-tight" style={{ color: "var(--text)" }}>Affiliate Network Overview</h2>
         </motion.div>
 
-        <div className="relative z-10 grid grid-cols-2 xl:grid-cols-4 gap-3 pb-6">
-          <KPICard label="All-Time Revenue"   value={stats.allTimeRevenue}      format="currency"    icon={DollarSign} iconColor="var(--accent)"   delta={12.4}  deltaLabel="vs last quarter" delay={0}   />
-          <KPICard label="Active Affiliates"  value={stats.activeAffiliates}    icon={Users}         iconColor="var(--success)"  delta={-31}   deltaLabel="from peak"       delay={0.1} />
-          <KPICard label="Program ROI"        value={stats.roi}                 format="multiplier"  icon={TrendingUp} iconColor="#A78BFA"            delta={0.4}   deltaLabel="vs last month"   delay={0.2} />
-          <KPICard label="Commissions Paid"   value={stats.allTimeCommissions}  format="currency"    icon={Award}      iconColor="var(--warning)"                                          delay={0.3} />
+        <div className="relative z-10 grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-3 pb-6">
+          <KPICard label="All-Time Revenue"     value={stats.allTimeRevenue}      format="currency"    icon={DollarSign}    iconColor="var(--accent)"   delta={12.4}  deltaLabel="vs last quarter" delay={0}    />
+          <KPICard label="Active Affiliates"    value={stats.activeAffiliates}    icon={Users}         iconColor="var(--success)"  delta={-31}   deltaLabel="from peak"       delay={0.08} />
+          <KPICard label="Program ROI"          value={stats.roi}                 format="multiplier"  icon={TrendingUp}    iconColor="#A78BFA"            delta={0.4}   deltaLabel="vs last month"   delay={0.16} />
+          <KPICard label="Commissions Paid"     value={stats.allTimeCommissions}  format="currency"    icon={Award}         iconColor="var(--warning)"                                          delay={0.24} />
+          <KPICard label="Avg Order Value"      value={stats.avgOrderValue}       format="currency"    icon={ShoppingCart}  iconColor="var(--accent-hi)"                                        delay={0.32} />
+          <KPICard label="Avg Conversion Rate"  value={stats.avgConversionRate}   format="percent"     icon={Activity}      iconColor="var(--success)"                                          delay={0.40} />
         </div>
       </div>
 

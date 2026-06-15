@@ -10,10 +10,22 @@ import { MultiSelect, ActiveFilterTags } from "@/components/ui/MultiSelect";
 import { DateRangeFilter, inDateRange, DateRange } from "@/components/ui/DateRangeFilter";
 import { AFFILIATES } from "@/data/seed/affiliates";
 import { formatCurrency, getSegmentColor } from "@/lib/dataUtils";
-import { Affiliate } from "@/lib/types";
+import { Affiliate, Country, CommissionTier, TrafficSource } from "@/lib/types";
 
-type SortKey = "revenue" | "customers" | "cancelRate" | "fraudScore" | "joined";
+type SortKey = "revenue" | "customers" | "cancelRate" | "fraudScore" | "joined" | "conversionRate" | "avgOrderValue";
 type SortDir = "asc" | "desc";
+
+const COUNTRY_FLAGS: Record<Country, string> = {
+  US: "🇺🇸", UK: "🇬🇧", CA: "🇨🇦", DE: "🇩🇪", AU: "🇦🇺", IN: "🇮🇳",
+  SE: "🇸🇪", NL: "🇳🇱", FR: "🇫🇷", SG: "🇸🇬", BR: "🇧🇷", PH: "🇵🇭",
+};
+
+const TIER_COLORS: Record<CommissionTier, string> = {
+  platinum: "#A78BFA",
+  gold: "#CA8A04",
+  silver: "#6B7280",
+  bronze: "#92400E",
+};
 
 function AffiliateModal({ affiliate, onClose }: { affiliate: Affiliate; onClose: () => void }) {
   return (
@@ -35,11 +47,13 @@ function AffiliateModal({ affiliate, onClose }: { affiliate: Affiliate; onClose:
             <h2 className="font-bold text-sm" style={{ color: "var(--text)" }}>{affiliate.name}</h2>
             <p className="text-xs" style={{ color: "var(--muted)" }}>{affiliate.email}</p>
             <p className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>Joined {affiliate.joinedAt} · {affiliate.campaignType}</p>
+            <p className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>{COUNTRY_FLAGS[affiliate.country]} {affiliate.country} · {affiliate.tier}</p>
           </div>
         </div>
-        <div className="flex gap-2 mb-4">
+        <div className="flex gap-2 mb-4 flex-wrap">
           <Badge variant={affiliate.segment} />
           <Badge variant={affiliate.status} />
+          <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: `${TIER_COLORS[affiliate.tier]}18`, color: TIER_COLORS[affiliate.tier], border: `1px solid ${TIER_COLORS[affiliate.tier]}40` }}>{affiliate.tier}</span>
         </div>
 
         <div className="mb-4">
@@ -55,6 +69,8 @@ function AffiliateModal({ affiliate, onClose }: { affiliate: Affiliate; onClose:
             { label: "Commissions", value: formatCurrency(affiliate.metrics.lifetimeCommissions) },
             { label: "Fraud Score", value: `${affiliate.metrics.fraudScore}/100` },
             { label: "Last Referral", value: affiliate.metrics.lastReferralAt.slice(0, 7) },
+            { label: "Conv. Rate", value: `${(affiliate.metrics.conversionRate * 100).toFixed(1)}%` },
+            { label: "Avg Order Value", value: `$${(affiliate.metrics.avgOrderValue / 100).toFixed(0)}` },
           ].map(({ label, value }) => (
             <div key={label} className="rounded-lg p-2.5" style={{ background: "var(--surface)" }}>
               <div className="text-xs mb-0.5" style={{ color: "var(--muted)" }}>{label}</div>
@@ -83,8 +99,13 @@ export default function Leaderboard() {
   const [segments, setSegments] = useState<string[]>([]);
   const [campaigns, setCampaigns] = useState<string[]>([]);
   const [statuses, setStatuses] = useState<string[]>([]);
+  const [countries, setCountries] = useState<string[]>([]);
+  const [tiers, setTiers] = useState<string[]>([]);
+  const [trafficSrcs, setTrafficSrcs] = useState<string[]>([]);
   const [joinedRange, setJoinedRange] = useState<DateRange | null>(null);
   const [revenueMin, setRevenueMin] = useState("");
+  const [revenueMax, setRevenueMax] = useState("");
+  const [cvrMin, setCvrMin] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("revenue");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [selected, setSelected] = useState<Affiliate | null>(null);
@@ -96,30 +117,38 @@ export default function Leaderboard() {
         if (segments.length && !segments.includes(a.segment)) return false;
         if (campaigns.length && !campaigns.includes(a.campaignType)) return false;
         if (statuses.length && !statuses.includes(a.status)) return false;
+        if (countries.length && !countries.includes(a.country)) return false;
+        if (tiers.length && !tiers.includes(a.tier)) return false;
+        if (trafficSrcs.length && !a.trafficSources.some(ts => trafficSrcs.includes(ts))) return false;
         if (joinedRange && !inDateRange(a.joinedAt, joinedRange)) return false;
         if (revenueMin && a.metrics.totalRevenue < Number(revenueMin) * 1000) return false;
+        if (revenueMax && a.metrics.totalRevenue > Number(revenueMax) * 1000) return false;
+        if (cvrMin && a.metrics.conversionRate < Number(cvrMin) / 100) return false;
         return true;
       })
       .sort((a, b) => {
         let av = 0, bv = 0;
-        if (sortKey === "revenue")    { av = a.metrics.totalRevenue; bv = b.metrics.totalRevenue; }
-        if (sortKey === "customers")  { av = a.metrics.activeCustomers; bv = b.metrics.activeCustomers; }
-        if (sortKey === "cancelRate") { av = a.metrics.cancelRate; bv = b.metrics.cancelRate; }
-        if (sortKey === "fraudScore") { av = a.metrics.fraudScore; bv = b.metrics.fraudScore; }
-        if (sortKey === "joined")     { av = new Date(a.joinedAt).getTime(); bv = new Date(b.joinedAt).getTime(); }
+        if (sortKey === "revenue")         { av = a.metrics.totalRevenue; bv = b.metrics.totalRevenue; }
+        if (sortKey === "customers")        { av = a.metrics.activeCustomers; bv = b.metrics.activeCustomers; }
+        if (sortKey === "cancelRate")       { av = a.metrics.cancelRate; bv = b.metrics.cancelRate; }
+        if (sortKey === "fraudScore")       { av = a.metrics.fraudScore; bv = b.metrics.fraudScore; }
+        if (sortKey === "joined")           { av = new Date(a.joinedAt).getTime(); bv = new Date(b.joinedAt).getTime(); }
+        if (sortKey === "conversionRate")   { av = a.metrics.conversionRate; bv = b.metrics.conversionRate; }
+        if (sortKey === "avgOrderValue")    { av = a.metrics.avgOrderValue; bv = b.metrics.avgOrderValue; }
         return sortDir === "desc" ? bv - av : av - bv;
       });
-  }, [search, segments, campaigns, statuses, joinedRange, revenueMin, sortKey, sortDir]);
+  }, [search, segments, campaigns, statuses, countries, tiers, trafficSrcs, joinedRange, revenueMin, revenueMax, cvrMin, sortKey, sortDir]);
 
   function toggleSort(key: SortKey) {
     if (sortKey === key) setSortDir(d => d === "desc" ? "asc" : "desc");
     else { setSortKey(key); setSortDir("desc"); }
   }
 
-  const activeFilters = segments.length + campaigns.length + statuses.length + (joinedRange ? 1 : 0) + (revenueMin ? 1 : 0);
+  const activeFilters = segments.length + campaigns.length + statuses.length + countries.length + tiers.length + trafficSrcs.length + (joinedRange ? 1 : 0) + (revenueMin ? 1 : 0) + (revenueMax ? 1 : 0) + (cvrMin ? 1 : 0);
 
   function clearAll() {
-    setSegments([]); setCampaigns([]); setStatuses([]); setJoinedRange(null); setRevenueMin(""); setSearch("");
+    setSegments([]); setCampaigns([]); setStatuses([]); setCountries([]); setTiers([]); setTrafficSrcs([]);
+    setJoinedRange(null); setRevenueMin(""); setRevenueMax(""); setCvrMin(""); setSearch("");
   }
 
   function SortIcon({ k }: { k: SortKey }) {
@@ -158,12 +187,44 @@ export default function Leaderboard() {
             { value: "inactive", label: "Inactive" },
             { value: "archived", label: "Archived" },
           ]} />
+          <MultiSelect label="Country" selected={countries} onChange={setCountries} options={[
+            { value: "US", label: "🇺🇸 US" }, { value: "UK", label: "🇬🇧 UK" },
+            { value: "CA", label: "🇨🇦 CA" }, { value: "DE", label: "🇩🇪 DE" },
+            { value: "AU", label: "🇦🇺 AU" }, { value: "IN", label: "🇮🇳 IN" },
+            { value: "SE", label: "🇸🇪 SE" }, { value: "NL", label: "🇳🇱 NL" },
+            { value: "FR", label: "🇫🇷 FR" }, { value: "SG", label: "🇸🇬 SG" },
+            { value: "BR", label: "🇧🇷 BR" }, { value: "PH", label: "🇵🇭 PH" },
+          ]} />
+          <MultiSelect label="Tier" selected={tiers} onChange={setTiers} options={[
+            { value: "platinum", label: "Platinum" },
+            { value: "gold", label: "Gold" },
+            { value: "silver", label: "Silver" },
+            { value: "bronze", label: "Bronze" },
+          ]} />
+          <MultiSelect label="Traffic" selected={trafficSrcs} onChange={setTrafficSrcs} options={[
+            { value: "organic-search", label: "Organic Search" },
+            { value: "paid-social", label: "Paid Social" },
+            { value: "youtube", label: "YouTube" },
+            { value: "email", label: "Email" },
+            { value: "podcast", label: "Podcast" },
+            { value: "linkedin", label: "LinkedIn" },
+            { value: "twitter-x", label: "Twitter/X" },
+            { value: "reddit", label: "Reddit" },
+          ]} />
           <DateRangeFilter value={joinedRange} onChange={setJoinedRange} label="Joined date" />
 
           <div className="flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
-            <span className="text-xs" style={{ color: "var(--muted)" }}>Rev ≥ $</span>
-            <input value={revenueMin} onChange={e => setRevenueMin(e.target.value)} placeholder="0K" className="w-12 bg-transparent text-xs outline-none font-mono" style={{ color: "var(--text)" }} type="number" min="0" />
+            <span className="text-xs" style={{ color: "var(--muted)" }}>Rev $</span>
+            <input value={revenueMin} onChange={e => setRevenueMin(e.target.value)} placeholder="min" className="w-10 bg-transparent text-xs outline-none font-mono" style={{ color: "var(--text)" }} type="number" min="0" />
+            <span className="text-xs" style={{ color: "var(--muted)" }}>–</span>
+            <input value={revenueMax} onChange={e => setRevenueMax(e.target.value)} placeholder="max" className="w-10 bg-transparent text-xs outline-none font-mono" style={{ color: "var(--text)" }} type="number" min="0" />
             <span className="text-xs" style={{ color: "var(--muted)" }}>K</span>
+          </div>
+
+          <div className="flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5" style={{ background: "var(--surface)", borderColor: "var(--border)" }}>
+            <span className="text-xs" style={{ color: "var(--muted)" }}>CVR ≥</span>
+            <input value={cvrMin} onChange={e => setCvrMin(e.target.value)} placeholder="0" className="w-10 bg-transparent text-xs outline-none font-mono" style={{ color: "var(--text)" }} type="number" min="0" max="100" step="0.1" />
+            <span className="text-xs" style={{ color: "var(--muted)" }}>%</span>
           </div>
 
           {activeFilters > 0 && (
@@ -179,6 +240,9 @@ export default function Leaderboard() {
             <ActiveFilterTags label="Segment" values={segments} onRemove={v => setSegments(s => s.filter(x => x !== v))} />
             <ActiveFilterTags label="Campaign" values={campaigns} onRemove={v => setCampaigns(s => s.filter(x => x !== v))} />
             <ActiveFilterTags label="Status" values={statuses} onRemove={v => setStatuses(s => s.filter(x => x !== v))} />
+            <ActiveFilterTags label="Country" values={countries} onRemove={v => setCountries(s => s.filter(x => x !== v))} />
+            <ActiveFilterTags label="Tier" values={tiers} onRemove={v => setTiers(s => s.filter(x => x !== v))} />
+            <ActiveFilterTags label="Traffic" values={trafficSrcs} onRemove={v => setTrafficSrcs(s => s.filter(x => x !== v))} />
             {joinedRange && (
               <span className="flex items-center gap-1 px-2 py-0.5 rounded-md text-xs" style={{ background: "rgba(8,145,178,0.1)", color: "var(--accent-hi)", border: "1px solid rgba(8,145,178,0.2)" }}>
                 Joined: {joinedRange.from} → {joinedRange.to}
@@ -187,8 +251,20 @@ export default function Leaderboard() {
             )}
             {revenueMin && (
               <span className="flex items-center gap-1 px-2 py-0.5 rounded-md text-xs" style={{ background: "rgba(8,145,178,0.1)", color: "var(--accent-hi)", border: "1px solid rgba(8,145,178,0.2)" }}>
-                Revenue ≥ ${revenueMin}K
+                Rev ≥ ${revenueMin}K
                 <button onClick={() => setRevenueMin("")} className="ml-0.5"><X size={9} /></button>
+              </span>
+            )}
+            {revenueMax && (
+              <span className="flex items-center gap-1 px-2 py-0.5 rounded-md text-xs" style={{ background: "rgba(8,145,178,0.1)", color: "var(--accent-hi)", border: "1px solid rgba(8,145,178,0.2)" }}>
+                Rev ≤ ${revenueMax}K
+                <button onClick={() => setRevenueMax("")} className="ml-0.5"><X size={9} /></button>
+              </span>
+            )}
+            {cvrMin && (
+              <span className="flex items-center gap-1 px-2 py-0.5 rounded-md text-xs" style={{ background: "rgba(8,145,178,0.1)", color: "var(--accent-hi)", border: "1px solid rgba(8,145,178,0.2)" }}>
+                CVR ≥ {cvrMin}%
+                <button onClick={() => setCvrMin("")} className="ml-0.5"><X size={9} /></button>
               </span>
             )}
           </div>
@@ -202,11 +278,18 @@ export default function Leaderboard() {
               <tr style={{ background: "var(--surface2)", borderBottom: "1px solid var(--border)" }}>
                 <th className="px-4 py-3 text-left font-semibold uppercase tracking-wider w-8" style={{ color: "var(--muted)" }}>#</th>
                 <th className="px-4 py-3 text-left font-semibold uppercase tracking-wider" style={{ color: "var(--muted)" }}>Affiliate</th>
+                <th className="px-4 py-3 text-left font-semibold uppercase tracking-wider hidden md:table-cell" style={{ color: "var(--muted)" }}>Country</th>
                 <th className="px-4 py-3 text-left font-semibold uppercase tracking-wider cursor-pointer" style={{ color: "var(--muted)" }} onClick={() => toggleSort("revenue")}>
                   <div className="flex items-center gap-1">Revenue <SortIcon k="revenue" /></div>
                 </th>
                 <th className="px-4 py-3 text-left font-semibold uppercase tracking-wider cursor-pointer" style={{ color: "var(--muted)" }} onClick={() => toggleSort("customers")}>
                   <div className="flex items-center gap-1">Customers <SortIcon k="customers" /></div>
+                </th>
+                <th className="px-4 py-3 text-left font-semibold uppercase tracking-wider cursor-pointer hidden lg:table-cell" style={{ color: "var(--muted)" }} onClick={() => toggleSort("conversionRate")}>
+                  <div className="flex items-center gap-1">CVR <SortIcon k="conversionRate" /></div>
+                </th>
+                <th className="px-4 py-3 text-left font-semibold uppercase tracking-wider cursor-pointer hidden xl:table-cell" style={{ color: "var(--muted)" }} onClick={() => toggleSort("avgOrderValue")}>
+                  <div className="flex items-center gap-1">AOV <SortIcon k="avgOrderValue" /></div>
                 </th>
                 <th className="px-4 py-3 text-left font-semibold uppercase tracking-wider cursor-pointer hidden lg:table-cell" style={{ color: "var(--muted)" }} onClick={() => toggleSort("cancelRate")}>
                   <div className="flex items-center gap-1">Cancel% <SortIcon k="cancelRate" /></div>
@@ -220,7 +303,7 @@ export default function Leaderboard() {
             </thead>
             <tbody>
               {filtered.length === 0 ? (
-                <tr><td colSpan={8} className="px-4 py-10 text-center text-xs" style={{ color: "var(--muted)" }}>No affiliates match the current filters.</td></tr>
+                <tr><td colSpan={11} className="px-4 py-10 text-center text-xs" style={{ color: "var(--muted)" }}>No affiliates match the current filters.</td></tr>
               ) : filtered.map((a, i) => (
                 <motion.tr
                   key={a.id}
@@ -243,8 +326,18 @@ export default function Leaderboard() {
                       </div>
                     </div>
                   </td>
+                  <td className="px-4 py-3 hidden md:table-cell">
+                    <span className="text-sm">{COUNTRY_FLAGS[a.country]}</span>
+                    <span className="ml-1 font-mono" style={{ color: "var(--text-secondary)" }}>{a.country}</span>
+                  </td>
                   <td className="px-4 py-3 font-mono font-semibold" style={{ color: "var(--text)" }}>{formatCurrency(a.metrics.totalRevenue)}</td>
                   <td className="px-4 py-3 font-mono" style={{ color: "var(--text-secondary)" }}>{a.metrics.activeCustomers}</td>
+                  <td className="px-4 py-3 font-mono hidden lg:table-cell" style={{ color: a.metrics.conversionRate > 0.12 ? "var(--warning)" : "var(--text-secondary)" }}>
+                    {(a.metrics.conversionRate * 100).toFixed(1)}%
+                  </td>
+                  <td className="px-4 py-3 font-mono hidden xl:table-cell" style={{ color: "var(--text-secondary)" }}>
+                    ${(a.metrics.avgOrderValue / 100).toFixed(0)}
+                  </td>
                   <td className="px-4 py-3 font-mono hidden lg:table-cell" style={{ color: a.metrics.cancelRate > 0.5 ? "var(--danger)" : "var(--text-secondary)" }}>
                     {(a.metrics.cancelRate * 100).toFixed(0)}%
                   </td>
