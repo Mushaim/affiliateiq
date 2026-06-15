@@ -65,10 +65,10 @@ export function TopBar({ title, subtitle }: Props) {
       </div>
 
       <div className="flex items-center gap-3 shrink-0">
-        {/* Timestamp + cron info */}
+        {/* Timestamp */}
         <div className="hidden sm:flex flex-col items-end leading-tight">
           <span className="text-xs font-medium tabular-nums" style={{ color: "var(--text-secondary, var(--muted))" }}>{lastRefresh}</span>
-          <span className="text-xs" style={{ color: "var(--muted)" }}>Cron: Mon 08:00 UTC</span>
+          <span className="text-xs" style={{ color: "var(--muted)" }}>Auto-syncs weekly</span>
         </div>
 
         <div className="w-px h-5" style={{ background: "var(--border)" }} />

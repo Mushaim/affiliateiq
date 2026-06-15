@@ -152,11 +152,17 @@ export function getMonthlyAffiliateStats() {
   for (const [month, v] of sorted) {
     months.push({ month, newAffiliates: v.newAff, newCustomers: v.newCust, revenue: v.rev, churnedCustomers: v.churn, clicks: v.clicks });
   }
-  return months;
+  // Only return months that have actual revenue — eliminates sparse pre-data months from joinedAt dates
+  const firstWithRevenue = months.findIndex(m => m.revenue > 0);
+  return firstWithRevenue >= 0 ? months.slice(firstWithRevenue) : months;
 }
 
 export function getQoQGrowth() {
   return [
+    { quarter: "Q3 2024", newCustomers: 68, churnedCustomers: 41, net: 27 },
+    { quarter: "Q4 2024", newCustomers: 74, churnedCustomers: 48, net: 26 },
+    { quarter: "Q1 2025", newCustomers: 61, churnedCustomers: 52, net: 9 },
+    { quarter: "Q2 2025", newCustomers: 55, churnedCustomers: 53, net: 2 },
     { quarter: "Q3 2025", newCustomers: 42, churnedCustomers: 58, net: -16 },
     { quarter: "Q4 2025", newCustomers: 38, churnedCustomers: 61, net: -23 },
     { quarter: "Q1 2026", newCustomers: 29, churnedCustomers: 43, net: -14 },
@@ -166,10 +172,13 @@ export function getQoQGrowth() {
 
 export function getCohortData() {
   const cohorts = [
+    { name: "Q3 2024", color: "#0891B2", values: [100, 85, 76, 70, 65, 61, 58, 56, 54, 53, 52, 51] },
+    { name: "Q4 2024", color: "#16A34A", values: [100, 83, 73, 67, 62, 58, 55, 52, 50, 48, 47, 46] },
     { name: "Q1 2025", color: "#3B82F6", values: [100, 82, 71, 64, 59, 55, 52, 49, 47, 45, 44, 43] },
     { name: "Q2 2025", color: "#10B981", values: [100, 79, 67, 59, 53, 48, 44, 41, 39, 37, 36, null] },
     { name: "Q3 2025", color: "#F59E0B", values: [100, 76, 63, 54, 48, 43, 39, 36, null, null, null, null] },
     { name: "Q4 2025", color: "#A78BFA", values: [100, 72, 58, 49, 43, 38, null, null, null, null, null, null] },
+    { name: "Q1 2026", color: "#DC2626", values: [100, 68, 54, 45, null, null, null, null, null, null, null, null] },
   ];
   const months = ["M0", "M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8", "M9", "M10", "M11"];
   return { cohorts, months };

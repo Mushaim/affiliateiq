@@ -45,7 +45,7 @@ export function Sidebar() {
       <div className="px-4 py-4 border-t" style={{ borderColor: "var(--border)" }}>
         <div className="text-xs" style={{ color: "var(--muted)" }}>
           <div className="font-semibold mb-0.5" style={{ color: "var(--text-secondary)" }}>NovaSaaS Co.</div>
-          <div>Weekly cron: Mon 8:00 UTC</div>
+          <div>Auto-syncs every Monday</div>
         </div>
       </div>
     </aside>

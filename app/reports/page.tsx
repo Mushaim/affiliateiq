@@ -136,7 +136,7 @@ export default function Reports() {
 
   return (
     <PageWrapper>
-      <TopBar title="Reports" subtitle="Auto-generated · every Monday 08:00 UTC" />
+      <TopBar title="Reports" subtitle="Weekly performance snapshots — NovaSaaS Co." />
 
       <div className="px-6 py-4 space-y-4">
         {/* Controls */}
@@ -153,7 +153,7 @@ export default function Reports() {
 
           <div className="flex items-center gap-1.5 text-xs ml-auto" style={{ color: "var(--muted)" }}>
             <div className="w-1.5 h-1.5 rounded-full pulse-slow" style={{ background: "var(--accent)" }} />
-            Cron: <code className="font-mono" style={{ color: "var(--accent-hi)" }}>0 8 * * 1</code> · Next: Mon Jun 16 08:00 UTC
+            Next sync: Mon Jun 22
           </div>
         </div>
 
