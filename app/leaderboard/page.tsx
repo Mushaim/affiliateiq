@@ -273,7 +273,8 @@ export default function Leaderboard() {
 
         {/* Table */}
         <FadeItem className="rounded-xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
-          <table className="w-full text-xs">
+          <div className="overflow-x-auto">
+          <table className="w-full text-xs min-w-[600px]">
             <thead>
               <tr style={{ background: "var(--surface2)", borderBottom: "1px solid var(--border)" }}>
                 <th className="px-4 py-3 text-left font-semibold uppercase tracking-wider w-8" style={{ color: "var(--muted)" }}>#</th>
@@ -352,6 +353,7 @@ export default function Leaderboard() {
               ))}
             </tbody>
           </table>
+          </div>
         </FadeItem>
       </div>
 

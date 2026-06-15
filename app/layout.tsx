@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Sidebar } from "@/components/layout/Sidebar";
+import { AppShell } from "@/components/layout/AppShell";
 import { DemoModeBanner } from "@/components/layout/DemoModeBanner";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -17,12 +17,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="flex flex-col h-screen overflow-hidden">
         <DemoModeBanner />
-        <div className="flex flex-1 overflow-hidden">
-          <Sidebar />
-          <main className="flex-1 overflow-y-auto" style={{ background: "var(--bg)" }}>
-            {children}
-          </main>
-        </div>
+        <AppShell>
+          {children}
+        </AppShell>
       </body>
     </html>
   );
